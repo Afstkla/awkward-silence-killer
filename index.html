@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Awkward Silence Killer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bungee+Shade&family=Bungee&family=DM+Mono:wght@400;500&family=Bangers&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --neon-yellow: #EDFF00;
+      --hot-pink: #FF2D78;
+      --electric-blue: #00D4FF;
+      --deep-purple: #1a0a2e;
+      --darker-purple: #0d0518;
+      --orange-fire: #FF6B2B;
+      --mint-green: #00FFB2;
+      --card-bg: rgba(255, 255, 255, 0.04);
+    }
+
+    html { height: 100%; }
+
+    body {
+      min-height: 100%;
+      background: var(--darker-purple);
+      color: #fff;
+      font-family: 'DM Mono', monospace;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse at 20% 50%, rgba(255, 45, 120, 0.08) 0%, transparent 60%),
+        radial-gradient(ellipse at 80% 20%, rgba(0, 212, 255, 0.06) 0%, transparent 50%),
+        radial-gradient(ellipse at 50% 80%, rgba(237, 255, 0, 0.04) 0%, transparent 50%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Noise texture overlay */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      opacity: 0.035;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+      background-size: 256px 256px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .container {
+      position: relative;
+      z-index: 1;
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem 4rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    /* Header */
+    .header {
+      text-align: center;
+      margin-bottom: 2.5rem;
+      padding-top: 1rem;
+    }
+
+    .header h1 {
+      font-family: 'Bungee Shade', sans-serif;
+      font-size: clamp(1.6rem, 6vw, 2.8rem);
+      line-height: 1.2;
+      color: var(--neon-yellow);
+      text-shadow:
+        0 0 40px rgba(237, 255, 0, 0.3),
+        0 0 80px rgba(237, 255, 0, 0.1);
+      letter-spacing: 0.02em;
+      margin-bottom: 0.5rem;
+    }
+
+    .subtitle {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.8rem;
+      color: rgba(255, 255, 255, 0.4);
+      text-transform: uppercase;
+      letter-spacing: 0.3em;
+    }
+
+    /* Category pills */
+    .categories {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      justify-content: center;
+      margin-bottom: 2rem;
+    }
+
+    .cat-pill {
+      padding: 0.4rem 1rem;
+      border-radius: 100px;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.7rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      cursor: pointer;
+      border: 1.5px solid;
+      transition: all 0.2s ease;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .cat-pill[data-cat="icebreaker"] {
+      color: var(--electric-blue);
+      border-color: rgba(0, 212, 255, 0.3);
+      background: rgba(0, 212, 255, 0.06);
+    }
+    .cat-pill[data-cat="icebreaker"].active {
+      background: rgba(0, 212, 255, 0.15);
+      border-color: var(--electric-blue);
+      box-shadow: 0 0 20px rgba(0, 212, 255, 0.15);
+    }
+
+    .cat-pill[data-cat="wouldyou"] {
+      color: var(--hot-pink);
+      border-color: rgba(255, 45, 120, 0.3);
+      background: rgba(255, 45, 120, 0.06);
+    }
+    .cat-pill[data-cat="wouldyou"].active {
+      background: rgba(255, 45, 120, 0.15);
+      border-color: var(--hot-pink);
+      box-shadow: 0 0 20px rgba(255, 45, 120, 0.15);
+    }
+
+    .cat-pill[data-cat="funfact"] {
+      color: var(--neon-yellow);
+      border-color: rgba(237, 255, 0, 0.3);
+      background: rgba(237, 255, 0, 0.06);
+    }
+    .cat-pill[data-cat="funfact"].active {
+      background: rgba(237, 255, 0, 0.12);
+      border-color: var(--neon-yellow);
+      box-shadow: 0 0 20px rgba(237, 255, 0, 0.12);
+    }
+
+    .cat-pill[data-cat="deep"] {
+      color: var(--mint-green);
+      border-color: rgba(0, 255, 178, 0.3);
+      background: rgba(0, 255, 178, 0.06);
+    }
+    .cat-pill[data-cat="deep"].active {
+      background: rgba(0, 255, 178, 0.15);
+      border-color: var(--mint-green);
+      box-shadow: 0 0 20px rgba(0, 255, 178, 0.15);
+    }
+
+    .cat-pill[data-cat="spicy"] {
+      color: var(--orange-fire);
+      border-color: rgba(255, 107, 43, 0.3);
+      background: rgba(255, 107, 43, 0.06);
+    }
+    .cat-pill[data-cat="spicy"].active {
+      background: rgba(255, 107, 43, 0.15);
+      border-color: var(--orange-fire);
+      box-shadow: 0 0 20px rgba(255, 107, 43, 0.15);
+    }
+
+    .cat-pill:not(.active) { opacity: 0.5; }
+    .cat-pill:hover { opacity: 1; }
+
+    /* The card */
+    .card-area {
+      width: 100%;
+      perspective: 1000px;
+      margin-bottom: 2.5rem;
+    }
+
+    .card {
+      width: 100%;
+      min-height: 240px;
+      background: var(--card-bg);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2.5rem 2rem;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.1s ease;
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 20px;
+      background: linear-gradient(135deg, rgba(255,255,255,0.03) 0%, transparent 50%);
+      pointer-events: none;
+    }
+
+    .card.shake {
+      animation: shake 0.4s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+    }
+
+    @keyframes shake {
+      10%, 90% { transform: translateX(-2px) rotate(-0.5deg); }
+      20%, 80% { transform: translateX(3px) rotate(0.5deg); }
+      30%, 50%, 70% { transform: translateX(-5px) rotate(-1deg); }
+      40%, 60% { transform: translateX(5px) rotate(1deg); }
+    }
+
+    .card-category {
+      font-family: 'Bangers', sans-serif;
+      font-size: 0.85rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      margin-bottom: 1.2rem;
+      opacity: 0;
+      transform: translateY(-10px);
+      transition: all 0.3s ease 0.1s;
+    }
+
+    .card.revealed .card-category {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .card-text {
+      font-family: 'Bungee', sans-serif;
+      font-size: clamp(1.1rem, 4vw, 1.5rem);
+      text-align: center;
+      line-height: 1.5;
+      color: #fff;
+      opacity: 0;
+      transform: scale(0.9);
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.15s;
+    }
+
+    .card.revealed .card-text {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    .card-empty {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.85rem;
+      color: rgba(255, 255, 255, 0.2);
+      text-align: center;
+      line-height: 1.8;
+    }
+
+    .card-empty .arrow {
+      display: block;
+      font-size: 2rem;
+      margin-top: 0.5rem;
+      animation: bounce 2s ease-in-out infinite;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(8px); }
+    }
+
+    /* The big button */
+    .kill-btn-wrap {
+      position: relative;
+      margin-bottom: 2rem;
+    }
+
+    .kill-btn {
+      font-family: 'Bungee', sans-serif;
+      font-size: clamp(1rem, 3.5vw, 1.3rem);
+      color: var(--darker-purple);
+      background: var(--neon-yellow);
+      border: none;
+      padding: 1rem 2.5rem;
+      border-radius: 16px;
+      cursor: pointer;
+      position: relative;
+      z-index: 2;
+      transition: all 0.15s ease;
+      box-shadow:
+        0 6px 0 0 #b8c700,
+        0 8px 30px rgba(237, 255, 0, 0.2);
+      letter-spacing: 0.05em;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .kill-btn:hover {
+      transform: translateY(-2px);
+      box-shadow:
+        0 8px 0 0 #b8c700,
+        0 12px 40px rgba(237, 255, 0, 0.3);
+    }
+
+    .kill-btn:active {
+      transform: translateY(4px);
+      box-shadow:
+        0 2px 0 0 #b8c700,
+        0 4px 20px rgba(237, 255, 0, 0.15);
+    }
+
+    /* Particles */
+    .particle {
+      position: fixed;
+      pointer-events: none;
+      z-index: 100;
+      border-radius: 50%;
+      animation: particle-fly 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+    }
+
+    @keyframes particle-fly {
+      0% { opacity: 1; transform: translate(0, 0) scale(1); }
+      100% { opacity: 0; transform: translate(var(--tx), var(--ty)) scale(0); }
+    }
+
+    /* Counter */
+    .counter {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.7rem;
+      color: rgba(255, 255, 255, 0.2);
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+    }
+
+    /* Keyboard hint */
+    .hint {
+      position: fixed;
+      bottom: 1.5rem;
+      left: 50%;
+      transform: translateX(-50%);
+      font-family: 'DM Mono', monospace;
+      font-size: 0.65rem;
+      color: rgba(255, 255, 255, 0.15);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+    }
+
+    .hint kbd {
+      display: inline-block;
+      padding: 0.15rem 0.5rem;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 4px;
+      margin: 0 0.2rem;
+      font-family: inherit;
+    }
+
+    /* Mobile tweaks */
+    @media (max-width: 500px) {
+      .container { padding: 1.5rem 1rem 3rem; }
+      .card { min-height: 200px; padding: 2rem 1.5rem; }
+      .hint { display: none; }
+    }
+
+    /* Load-in animation */
+    .header, .categories, .card-area, .kill-btn-wrap, .counter {
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fade-up 0.6s ease forwards;
+    }
+    .header { animation-delay: 0s; }
+    .categories { animation-delay: 0.1s; }
+    .card-area { animation-delay: 0.2s; }
+    .kill-btn-wrap { animation-delay: 0.3s; }
+    .counter { animation-delay: 0.4s; }
+
+    @keyframes fade-up {
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>The Awkward Silence Killer</h1>
+      <p class="subtitle">Never suffer in silence again</p>
+    </div>
+
+    <div class="categories">
+      <span class="cat-pill active" data-cat="icebreaker">Icebreakers</span>
+      <span class="cat-pill active" data-cat="wouldyou">Would You Rather</span>
+      <span class="cat-pill active" data-cat="funfact">Fun Facts</span>
+      <span class="cat-pill active" data-cat="deep">Deep Cuts</span>
+      <span class="cat-pill active" data-cat="spicy">Spicy</span>
+    </div>
+
+    <div class="card-area">
+      <div class="card" id="card">
+        <div class="card-empty">
+          Pick your categories &amp; smash the button<span class="arrow">&darr;</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="kill-btn-wrap">
+      <button class="kill-btn" id="killBtn">Kill the Silence</button>
+    </div>
+
+    <div class="counter" id="counter">0 silences killed</div>
+  </div>
+
+  <div class="hint">Press <kbd>Space</kbd> to kill</div>
+
+  <script>
+    const prompts = {
+      icebreaker: [
+        "What's the most useless talent you have?",
+        "If you could only eat one meal for the rest of your life, what would it be?",
+        "What's the weirdest thing you've ever Googled?",
+        "If your life had a theme song, what would it be?",
+        "What's the strangest compliment you've ever received?",
+        "If you were a ghost, who would you haunt first?",
+        "What's your most controversial food opinion?",
+        "If you could add a word to the dictionary, what would it be?",
+        "What's the worst haircut you've ever had?",
+        "If animals could talk, which would be the rudest?",
+        "What's your go-to karaoke song?",
+        "If you could live in any TV show, which one?",
+        "What's the most embarrassing thing in your search history?",
+        "If you had to change your name, what would you pick?",
+        "What did you think was cool as a kid that embarrasses you now?",
+        "What's the pettiest hill you'll die on?",
+        "If you could master any instrument overnight, which one?",
+        "What's your most irrational fear?",
+        "What's something everyone loves that you secretly hate?",
+        "If your pet could suddenly speak, what would they say about you?"
+      ],
+      wouldyou: [
+        "Would you rather always have to sing instead of speak, or dance everywhere you walk?",
+        "Would you rather fight one horse-sized duck or 100 duck-sized horses?",
+        "Would you rather know how you die or when you die?",
+        "Would you rather have fingers as long as your legs or legs as long as your fingers?",
+        "Would you rather always be 10 minutes late or 20 minutes early?",
+        "Would you rather have unlimited pizza or unlimited tacos for life?",
+        "Would you rather be able to talk to animals or speak every human language?",
+        "Would you rather give up your phone or give up your bed?",
+        "Would you rather have a rewind button or a pause button for your life?",
+        "Would you rather only be able to whisper or only be able to shout?",
+        "Would you rather have no eyebrows or only one eyebrow?",
+        "Would you rather live without music or without movies?",
+        "Would you rather be famous but hated, or unknown but loved?",
+        "Would you rather have hiccups for the rest of your life or always feel like you need to sneeze?",
+        "Would you rather be able to fly but only 2 feet off the ground, or run at 100mph but only for 10 seconds?"
+      ],
+      funfact: [
+        "A group of flamingos is called a 'flamboyance'",
+        "Honey never spoils. Archaeologists found 3,000-year-old honey in Egyptian tombs that was still edible",
+        "Octopuses have three hearts, nine brains, and blue blood",
+        "The inventor of the Pringles can is buried in one",
+        "A day on Venus is longer than a year on Venus",
+        "Bananas are berries, but strawberries aren't",
+        "There are more possible chess games than atoms in the observable universe",
+        "Cows have best friends and get stressed when separated",
+        "The shortest war in history lasted 38 minutes (Britain vs Zanzibar, 1896)",
+        "A jiffy is an actual unit of time: 1/100th of a second",
+        "Wombat poop is cube-shaped",
+        "The human nose can detect over 1 trillion different scents",
+        "Scotland's national animal is the unicorn",
+        "More people are killed by vending machines each year than by sharks",
+        "The original name for the search engine Google was Backrub"
+      ],
+      deep: [
+        "What's a belief you held strongly 5 years ago that you no longer believe?",
+        "What's the most beautiful thing you've ever seen?",
+        "If you could have dinner with any person, dead or alive, who and why?",
+        "What's something you've never told anyone?",
+        "What do you think people misunderstand about you?",
+        "What's a small moment that changed your life?",
+        "What would you do differently if nobody would judge you?",
+        "What's the best piece of advice you've ever ignored?",
+        "What's something you're proud of that nobody knows about?",
+        "If you could send a message to your teenage self, what would it say?",
+        "What does your ideal ordinary Tuesday look like?",
+        "What's a question you wish people would ask you more?",
+        "What's something you think about way more than you should?",
+        "When did you last change your mind about something important?",
+        "What's a memory that always makes you smile?"
+      ],
+      spicy: [
+        "What's the biggest lie you've ever told?",
+        "What's your most unpopular opinion?",
+        "Who in this room would survive the longest in a zombie apocalypse?",
+        "What's the most trouble you've ever been in?",
+        "If you had to roast someone in this room, who and what would you say?",
+        "What's your guilty pleasure that you'd be embarrassed if people found out?",
+        "What's the worst date you've ever been on?",
+        "What rule do you break regularly without guilt?",
+        "What's the most embarrassing thing you've been caught doing?",
+        "Who was your most embarrassing crush?",
+        "What's the dumbest thing you've ever spent money on?",
+        "What's a secret skill you have that nobody here knows about?",
+        "What conspiracy theory do you lowkey believe?",
+        "What's the worst advice you've ever followed?",
+        "If you had to delete all social media except one, which do you keep?"
+      ]
+    };
+
+    const catColors = {
+      icebreaker: 'var(--electric-blue)',
+      wouldyou: 'var(--hot-pink)',
+      funfact: 'var(--neon-yellow)',
+      deep: 'var(--mint-green)',
+      spicy: 'var(--orange-fire)'
+    };
+
+    const catLabels = {
+      icebreaker: 'Icebreaker',
+      wouldyou: 'Would You Rather',
+      funfact: 'Fun Fact',
+      deep: 'Deep Cut',
+      spicy: 'Spicy'
+    };
+
+    let killCount = 0;
+    let history = [];
+    const card = document.getElementById('card');
+    const killBtn = document.getElementById('killBtn');
+    const counter = document.getElementById('counter');
+    const pills = document.querySelectorAll('.cat-pill');
+
+    // Toggle categories
+    pills.forEach(pill => {
+      pill.addEventListener('click', () => {
+        pill.classList.toggle('active');
+      });
+    });
+
+    function getActiveCategories() {
+      return [...document.querySelectorAll('.cat-pill.active')].map(p => p.dataset.cat);
+    }
+
+    function getRandomPrompt() {
+      const cats = getActiveCategories();
+      if (cats.length === 0) return null;
+
+      const available = [];
+      cats.forEach(cat => {
+        prompts[cat].forEach((text, i) => {
+          const key = `${cat}-${i}`;
+          if (!history.includes(key)) {
+            available.push({ cat, text, key });
+          }
+        });
+      });
+
+      // Reset history if we've seen everything
+      if (available.length === 0) {
+        history = [];
+        return getRandomPrompt();
+      }
+
+      const pick = available[Math.floor(Math.random() * available.length)];
+      history.push(pick.key);
+      return pick;
+    }
+
+    function spawnParticles(x, y) {
+      const colors = ['var(--neon-yellow)', 'var(--hot-pink)', 'var(--electric-blue)', 'var(--mint-green)', 'var(--orange-fire)'];
+      for (let i = 0; i < 12; i++) {
+        const p = document.createElement('div');
+        p.className = 'particle';
+        const size = Math.random() * 8 + 4;
+        const angle = (Math.PI * 2 * i) / 12 + Math.random() * 0.5;
+        const dist = Math.random() * 120 + 60;
+        p.style.cssText = `
+          left: ${x}px; top: ${y}px;
+          width: ${size}px; height: ${size}px;
+          background: ${colors[Math.floor(Math.random() * colors.length)]};
+          --tx: ${Math.cos(angle) * dist}px;
+          --ty: ${Math.sin(angle) * dist}px;
+        `;
+        document.body.appendChild(p);
+        setTimeout(() => p.remove(), 800);
+      }
+    }
+
+    function kill(e) {
+      const prompt = getRandomPrompt();
+      if (!prompt) {
+        card.innerHTML = '<div class="card-empty">Select at least one category!</div>';
+        return;
+      }
+
+      // Shake
+      card.classList.remove('shake', 'revealed');
+      void card.offsetWidth; // reflow
+      card.classList.add('shake');
+
+      // Particles from button
+      const rect = killBtn.getBoundingClientRect();
+      spawnParticles(rect.left + rect.width / 2, rect.top);
+
+      // Update card content after brief delay
+      setTimeout(() => {
+        card.innerHTML = `
+          <div class="card-category" style="color: ${catColors[prompt.cat]}">${catLabels[prompt.cat]}</div>
+          <div class="card-text">${prompt.text}</div>
+        `;
+        card.classList.add('revealed');
+
+        // Glow border matching category
+        card.style.borderColor = catColors[prompt.cat].replace('var(', '').replace(')', '');
+        const color = getComputedStyle(document.documentElement).getPropertyValue(
+          catColors[prompt.cat].replace('var(', '').replace(')', '')
+        );
+        card.style.borderColor = `rgba(255,255,255,0.08)`;
+        card.style.boxShadow = `0 0 40px ${catColors[prompt.cat].replace('var(', 'var(').replace(')', '')}15, inset 0 0 40px ${catColors[prompt.cat]}08`;
+      }, 150);
+
+      killCount++;
+      counter.textContent = `${killCount} silence${killCount !== 1 ? 's' : ''} killed`;
+    }
+
+    killBtn.addEventListener('click', kill);
+
+    document.addEventListener('keydown', (e) => {
+      if (e.code === 'Space' && e.target === document.body) {
+        e.preventDefault();
+        kill(e);
+      }
+    });
+  </script>
+</body>
+</html>
