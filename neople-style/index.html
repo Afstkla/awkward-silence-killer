@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Awkward Silence Killer — Neople Edition</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --teal: #0DB4A7;
+      --teal-dark: #0A9B90;
+      --teal-light: #E8F8F6;
+      --teal-glow: rgba(13, 180, 167, 0.12);
+      --navy: #1A2B3C;
+      --navy-light: #2D4356;
+      --warm-gray: #F7F5F2;
+      --warm-gray-dark: #EDEBE8;
+      --text: #1A2B3C;
+      --text-muted: #7A8B9A;
+      --text-light: #A3B1BD;
+      --white: #FFFFFF;
+      --coral: #F2756D;
+      --purple-soft: #8B7EC8;
+      --amber: #E8A838;
+      --sky: #5BA4D9;
+      --sage: #6DB893;
+      --radius: 14px;
+      --radius-sm: 10px;
+      --shadow-sm: 0 1px 3px rgba(26, 43, 60, 0.06);
+      --shadow-md: 0 4px 16px rgba(26, 43, 60, 0.08);
+      --shadow-lg: 0 8px 32px rgba(26, 43, 60, 0.10);
+    }
+
+    html { height: 100%; }
+
+    body {
+      min-height: 100%;
+      background: var(--warm-gray);
+      color: var(--text);
+      font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    .container {
+      max-width: 620px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem 4rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    /* Badge */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: var(--white);
+      border: 1px solid var(--warm-gray-dark);
+      border-radius: 100px;
+      padding: 0.35rem 0.9rem;
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      margin-bottom: 1.5rem;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .badge-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--teal);
+      animation: pulse-dot 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.6; transform: scale(0.8); }
+    }
+
+    /* Header */
+    .header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .header h1 {
+      font-family: 'Instrument Serif', Georgia, serif;
+      font-size: clamp(2rem, 7vw, 3rem);
+      font-weight: 400;
+      line-height: 1.15;
+      color: var(--navy);
+      margin-bottom: 0.6rem;
+    }
+
+    .header h1 em {
+      font-style: italic;
+      color: var(--teal);
+    }
+
+    .header p {
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+      max-width: 420px;
+      margin: 0 auto;
+    }
+
+    /* Category chips */
+    .categories {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      justify-content: center;
+      margin-bottom: 1.8rem;
+    }
+
+    .chip {
+      padding: 0.4rem 0.85rem;
+      border-radius: 100px;
+      font-size: 0.78rem;
+      font-weight: 500;
+      cursor: pointer;
+      border: 1.5px solid var(--warm-gray-dark);
+      background: var(--white);
+      color: var(--text-muted);
+      transition: all 0.2s ease;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .chip:hover { border-color: var(--text-light); }
+
+    .chip.active[data-cat="icebreaker"] {
+      background: var(--teal-light);
+      border-color: var(--teal);
+      color: var(--teal-dark);
+    }
+    .chip.active[data-cat="wouldyou"] {
+      background: #FFF0EF;
+      border-color: var(--coral);
+      color: #C4524A;
+    }
+    .chip.active[data-cat="csfact"] {
+      background: #FFF7E8;
+      border-color: var(--amber);
+      color: #B8862D;
+    }
+    .chip.active[data-cat="team"] {
+      background: #F0EDFA;
+      border-color: var(--purple-soft);
+      color: #6A5FA6;
+    }
+    .chip.active[data-cat="spicy"] {
+      background: #EBF5FF;
+      border-color: var(--sky);
+      color: #3D7DB8;
+    }
+
+    .chip:not(.active) { opacity: 0.55; }
+    .chip:not(.active):hover { opacity: 0.8; }
+
+    /* Card */
+    .card-area {
+      width: 100%;
+      margin-bottom: 1.8rem;
+    }
+
+    .card {
+      width: 100%;
+      min-height: 220px;
+      background: var(--white);
+      border: 1px solid var(--warm-gray-dark);
+      border-radius: var(--radius);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2.5rem 2rem;
+      position: relative;
+      box-shadow: var(--shadow-md);
+      transition: all 0.3s ease;
+      overflow: hidden;
+    }
+
+    .card::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: var(--teal);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .card.revealed::after { opacity: 1; }
+
+    .card.pop {
+      animation: pop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+    }
+
+    @keyframes pop {
+      0% { transform: scale(1); }
+      40% { transform: scale(0.97); }
+      100% { transform: scale(1); }
+    }
+
+    .card-label {
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 1rem;
+      padding: 0.25rem 0.7rem;
+      border-radius: 100px;
+      opacity: 0;
+      transform: translateY(-8px);
+      transition: all 0.3s ease 0.05s;
+    }
+
+    .card.revealed .card-label {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .card-label[data-cat="icebreaker"] { background: var(--teal-light); color: var(--teal-dark); }
+    .card-label[data-cat="wouldyou"] { background: #FFF0EF; color: #C4524A; }
+    .card-label[data-cat="csfact"] { background: #FFF7E8; color: #B8862D; }
+    .card-label[data-cat="team"] { background: #F0EDFA; color: #6A5FA6; }
+    .card-label[data-cat="spicy"] { background: #EBF5FF; color: #3D7DB8; }
+
+    .card-text {
+      font-family: 'Instrument Serif', Georgia, serif;
+      font-size: clamp(1.15rem, 4vw, 1.45rem);
+      text-align: center;
+      line-height: 1.55;
+      color: var(--navy);
+      opacity: 0;
+      transform: translateY(6px);
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.1s;
+    }
+
+    .card.revealed .card-text {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .card-empty {
+      text-align: center;
+      color: var(--text-light);
+      font-size: 0.9rem;
+      line-height: 1.8;
+    }
+
+    .card-empty svg {
+      display: block;
+      margin: 0 auto 0.8rem;
+      opacity: 0.3;
+    }
+
+    /* Button */
+    .btn-wrap { margin-bottom: 1.5rem; }
+
+    .kill-btn {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--white);
+      background: var(--teal);
+      border: none;
+      padding: 0.85rem 2rem;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 0 2px 8px rgba(13, 180, 167, 0.25);
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .kill-btn::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(255,255,255,0.12) 0%, transparent 100%);
+      pointer-events: none;
+    }
+
+    .kill-btn:hover {
+      background: var(--teal-dark);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 16px rgba(13, 180, 167, 0.3);
+    }
+
+    .kill-btn:active {
+      transform: translateY(1px);
+      box-shadow: 0 1px 4px rgba(13, 180, 167, 0.2);
+    }
+
+    /* Confetti dots */
+    .confetti-dot {
+      position: fixed;
+      pointer-events: none;
+      z-index: 100;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      animation: confetti-fall 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+    }
+
+    @keyframes confetti-fall {
+      0% { opacity: 1; transform: translate(0, 0) scale(1) rotate(0deg); }
+      100% { opacity: 0; transform: translate(var(--tx), var(--ty)) scale(0) rotate(var(--rot)); }
+    }
+
+    /* Counter */
+    .counter {
+      font-size: 0.78rem;
+      color: var(--text-light);
+      font-weight: 500;
+    }
+
+    /* Keyboard hint */
+    .hint {
+      position: fixed;
+      bottom: 1.2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 0.7rem;
+      color: var(--text-light);
+      opacity: 0.5;
+    }
+
+    .hint kbd {
+      display: inline-block;
+      padding: 0.1rem 0.45rem;
+      background: var(--white);
+      border: 1px solid var(--warm-gray-dark);
+      border-radius: 4px;
+      font-family: inherit;
+      font-size: 0.65rem;
+      margin: 0 0.15rem;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+    }
+
+    /* Back link */
+    .back-link {
+      position: fixed;
+      top: 1.2rem;
+      left: 1.5rem;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+    .back-link:hover { color: var(--teal); }
+
+    @media (max-width: 500px) {
+      .container { padding: 1.5rem 1rem 3rem; }
+      .card { min-height: 190px; padding: 2rem 1.5rem; }
+      .hint { display: none; }
+      .back-link { position: static; margin-bottom: 1rem; align-self: flex-start; }
+    }
+
+    /* Load-in */
+    .badge, .header, .categories, .card-area, .btn-wrap, .counter {
+      opacity: 0;
+      transform: translateY(14px);
+      animation: slide-in 0.5s ease forwards;
+    }
+    .badge { animation-delay: 0s; }
+    .header { animation-delay: 0.06s; }
+    .categories { animation-delay: 0.12s; }
+    .card-area { animation-delay: 0.18s; }
+    .btn-wrap { animation-delay: 0.24s; }
+    .counter { animation-delay: 0.3s; }
+
+    @keyframes slide-in {
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+  <a href="/" class="back-link">&larr; Original version</a>
+
+  <div class="container">
+    <div class="badge">
+      <span class="badge-dot"></span>
+      Neople Edition
+    </div>
+
+    <div class="header">
+      <h1>Kill the <em>awkward</em> silence</h1>
+      <p>Conversation starters for CS teams, Neople colleagues, and anyone who's been on one too many silent standups.</p>
+    </div>
+
+    <div class="categories">
+      <span class="chip active" data-cat="icebreaker">Icebreakers</span>
+      <span class="chip active" data-cat="wouldyou">Would You Rather</span>
+      <span class="chip active" data-cat="csfact">CS Wisdom</span>
+      <span class="chip active" data-cat="team">Team Vibes</span>
+      <span class="chip active" data-cat="spicy">Spicy Takes</span>
+    </div>
+
+    <div class="card-area">
+      <div class="card" id="card">
+        <div class="card-empty">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          Pick your categories and hit the button
+        </div>
+      </div>
+    </div>
+
+    <div class="btn-wrap">
+      <button class="kill-btn" id="killBtn">Kill the silence</button>
+    </div>
+
+    <div class="counter" id="counter">0 silences killed</div>
+  </div>
+
+  <div class="hint">Press <kbd>Space</kbd> to kill</div>
+
+  <script>
+    const prompts = {
+      icebreaker: [
+        "What's the best customer message you've ever received?",
+        "If you had to write a canned response for your life, what would it say?",
+        "What's the most creative excuse a customer has given for a return?",
+        "If our AI Neople had a dating profile, what would the bio say?",
+        "What song plays in your head when you open your inbox on Monday?",
+        "If you could auto-reply to one person in your life, who and what?",
+        "What's the weirdest thing you've ever had to look up for a customer?",
+        "If customer service had a theme park, what would the rides be called?",
+        "What's your comfort snack during peak season?",
+        "If you could add one emoji to our canned responses, which one?",
+        "What's the most wholesome customer interaction you've ever had?",
+        "If our team had a band, what would we be called?",
+        "What's one thing you thought was impossible in CS that turned out to be easy?",
+        "If your inbox was a movie genre, what would it be today?",
+        "What's your unpopular opinion about customer support?",
+        "If you had a signature sign-off, what would it be?",
+        "What's the funniest typo you've made in a customer email?",
+        "If you could train an AI on one skill you have, what would it be?",
+        "What's the first thing you'd automate about your morning routine?",
+        "If Neople had a mascot animal, what should it be and why?"
+      ],
+      wouldyou: [
+        "Would you rather handle 100 easy tickets or 10 really complex ones?",
+        "Would you rather deal with an angry customer or a confusingly polite one who's actually furious?",
+        "Would you rather never say 'sorry for the inconvenience' again, or never say 'per our policy'?",
+        "Would you rather have a customer read the FAQ first, or have unlimited patience?",
+        "Would you rather work peak season with perfect tools, or slow season with terrible ones?",
+        "Would you rather get CC'd on every email in the company, or never get CC'd on anything?",
+        "Would you rather have an AI write all your emails but with random dad jokes, or write them yourself forever?",
+        "Would you rather have a customer who sends 20 short messages, or one who sends a 2000-word essay?",
+        "Would you rather handle only phone calls or only live chat for a year?",
+        "Would you rather have perfect CSAT but long response times, or fast responses but mediocre CSAT?",
+        "Would you rather explain a return policy to 100 people, or troubleshoot one impossible tech issue?",
+        "Would you rather your Neople handles all the boring tickets, or helps with the hard ones?",
+        "Would you rather have no templates but great memory, or infinite templates but can't improvise?",
+        "Would you rather all customers use proper grammar, or all customers include order numbers?",
+        "Would you rather present the quarterly CSAT report to the CEO, or handle the worst review personally?"
+      ],
+      csfact: [
+        "It costs 5-25x more to acquire a new customer than to retain an existing one",
+        "89% of customers switch to a competitor after a poor service experience",
+        "The average person spends 43 days of their life on hold with customer service",
+        "Companies that lead in CX outperform laggards by nearly 80% in revenue growth",
+        "71% of customers expect a company to know them before they make contact",
+        "Customers who have a positive experience are 3.5x more likely to repurchase",
+        "The first automated customer support was a phone tree invented in 1989",
+        "A 5% increase in customer retention can increase profits by 25-95%",
+        "It takes 12 positive experiences to make up for one unresolved negative one",
+        "68% of customers leave because they feel a company doesn't care about them",
+        "The 'WISMO' (Where Is My Order) query makes up ~50% of all e-commerce CS tickets",
+        "Customer service reps who use the customer's name see 21% higher satisfaction scores",
+        "The average email response time in customer service is 12 hours — customers expect 1",
+        "86% of buyers are willing to pay more for a great customer experience",
+        "Neople fact: AI coworkers can handle ~80% of incoming questions automatically"
+      ],
+      team: [
+        "What's one thing about your work style that your teammates might not know?",
+        "What's the best feedback you've ever received from a colleague?",
+        "If you could swap roles with anyone at Neople for a day, who and why?",
+        "What's something a coworker taught you that changed how you work?",
+        "What's your hot take on the best way to organize a shared inbox?",
+        "What's the most underrated skill in customer service?",
+        "If you could create one new company tradition, what would it be?",
+        "What's the best team celebration we've had?",
+        "What energizes you most about your work?",
+        "What's one thing we do well as a team that other companies don't?",
+        "If you could give a TED talk about anything CS-related, what's the topic?",
+        "What's a small process change that made your work life dramatically better?",
+        "What's the most helpful tool or trick you use daily that others might not know about?",
+        "If you had to describe our team culture in three words, what would they be?",
+        "What's the best thing about working in customer service that outsiders don't get?"
+      ],
+      spicy: [
+        "Hot take: most 'urgent' tickets aren't actually urgent. Agree or disagree?",
+        "What's one CS industry practice you think should be abolished?",
+        "Is the customer actually always right? Defend your answer.",
+        "What's the most absurd company policy you've ever had to enforce?",
+        "AI will replace CS agents: myth, partial truth, or inevitable?",
+        "What's the worst piece of advice a CS manager has ever given you?",
+        "Should CSAT scores determine bonuses? Why or why not?",
+        "What's the biggest lie in the customer service industry?",
+        "Would you rather have brutal honesty from customers or polite vagueness?",
+        "What's one popular CS metric that you think is completely useless?",
+        "Should customers who are rude be deprioritized? Make your case.",
+        "Is 'exceeding expectations' actually sustainable, or is it a trap?",
+        "What's the most overrated customer service channel?",
+        "Unpopular opinion time: what's something everyone in CS does that doesn't actually help?",
+        "If you could send one honest auto-reply to every customer, what would it say?"
+      ]
+    };
+
+    const catLabels = {
+      icebreaker: 'Icebreaker',
+      wouldyou: 'Would You Rather',
+      csfact: 'CS Wisdom',
+      team: 'Team Vibes',
+      spicy: 'Spicy Take'
+    };
+
+    let killCount = 0;
+    let history = [];
+    const card = document.getElementById('card');
+    const killBtn = document.getElementById('killBtn');
+    const counter = document.getElementById('counter');
+    const chips = document.querySelectorAll('.chip');
+
+    chips.forEach(chip => {
+      chip.addEventListener('click', () => chip.classList.toggle('active'));
+    });
+
+    function getActiveCategories() {
+      return [...document.querySelectorAll('.chip.active')].map(c => c.dataset.cat);
+    }
+
+    function getRandomPrompt() {
+      const cats = getActiveCategories();
+      if (cats.length === 0) return null;
+
+      const available = [];
+      cats.forEach(cat => {
+        prompts[cat].forEach((text, i) => {
+          const key = `${cat}-${i}`;
+          if (!history.includes(key)) available.push({ cat, text, key });
+        });
+      });
+
+      if (available.length === 0) {
+        history = [];
+        return getRandomPrompt();
+      }
+
+      const pick = available[Math.floor(Math.random() * available.length)];
+      history.push(pick.key);
+      return pick;
+    }
+
+    function spawnConfetti(x, y) {
+      const colors = ['var(--teal)', 'var(--coral)', 'var(--purple-soft)', 'var(--amber)', 'var(--sage)'];
+      for (let i = 0; i < 8; i++) {
+        const dot = document.createElement('div');
+        dot.className = 'confetti-dot';
+        const angle = (Math.PI * 2 * i) / 8 + Math.random() * 0.4;
+        const dist = Math.random() * 80 + 40;
+        dot.style.cssText = `
+          left: ${x}px; top: ${y}px;
+          background: ${colors[Math.floor(Math.random() * colors.length)]};
+          --tx: ${Math.cos(angle) * dist}px;
+          --ty: ${Math.sin(angle) * dist}px;
+          --rot: ${Math.random() * 360}deg;
+        `;
+        document.body.appendChild(dot);
+        setTimeout(() => dot.remove(), 700);
+      }
+    }
+
+    function kill() {
+      const prompt = getRandomPrompt();
+      if (!prompt) {
+        card.innerHTML = '<div class="card-empty">Select at least one category!</div>';
+        return;
+      }
+
+      card.classList.remove('pop', 'revealed');
+      void card.offsetWidth;
+      card.classList.add('pop');
+
+      const rect = killBtn.getBoundingClientRect();
+      spawnConfetti(rect.left + rect.width / 2, rect.top + rect.height / 2);
+
+      setTimeout(() => {
+        card.innerHTML = `
+          <div class="card-label" data-cat="${prompt.cat}">${catLabels[prompt.cat]}</div>
+          <div class="card-text">${prompt.text}</div>
+        `;
+        card.classList.add('revealed');
+      }, 120);
+
+      killCount++;
+      counter.textContent = `${killCount} silence${killCount !== 1 ? 's' : ''} killed`;
+    }
+
+    killBtn.addEventListener('click', kill);
+
+    document.addEventListener('keydown', (e) => {
+      if (e.code === 'Space' && e.target === document.body) {
+        e.preventDefault();
+        kill();
+      }
+    });
+  </script>
+</body>
+</html>
